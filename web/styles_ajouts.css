@@ -1,0 +1,93 @@
+/* Effet d'ombrages sur un texte */
+
+.ombre
+{
+	color: #FFFFFF;
+	text-shadow:
+		1px 1px 2px #000000,
+		1px 2px 2px #000000,
+		2px 1px 2px #000000,
+		2px 2px 2px #000000
+	;
+}
+
+/* Effet de surlignage d'un lien pendant son survol */
+
+.lien
+{
+	color: #BCB9B9;
+	text-decoration: underline;
+}
+
+.lien:hover
+{
+	color: #EDDDDD;
+	text-decoration: underline;
+}
+
+
+/* Effet de surlignage d'un bouton pendant son survol */
+
+.bouton
+{
+	background-color: #117733;
+}
+
+.bouton:hover
+{
+	color: white;
+	background-color: #22AA55;
+}
+
+
+/* Effet de surlignage après l'appui sur un bouton */
+
+#bouton_surligne:target
+{
+	border-radius: 3px;
+	animation: surligner 1000ms ease-out;
+}
+
+#etoile_surlignee:target
+{
+	border-radius: 3px;
+	animation: surligner 1000ms ease-out;
+}
+
+@keyframes surligner
+{
+	0%
+	{
+		background-color: #EEEEEE;
+	}
+	100%
+	{
+		background-color: #378BBA;
+	}
+}
+
+
+/* Effet de parallaxe sur une image */
+
+.parallaxe
+{
+	background-attachment: fixed;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+	height: 100%;
+}
+
+
+/*
+ *  L'effet de prallaxe ne fonctionne pas sur tablette et smartphone,
+ *  alors on l'enlève.
+ */
+
+@media only screen and (max-device-width: 1366px)
+{
+	.parallaxe
+	{
+		background-attachment: scroll;
+	}
+}
