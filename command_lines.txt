@@ -1,0 +1,973 @@
+Video 02 :
+----------
+
+sudo -s
+apt-get install build-essential wget libssl-dev libncurses5-dev libnewt-dev libxml2-dev linux-headers-$ (uname -r) libsqlite3-dev uuid-dev libedit-dev libjansson-dev
+cd Downloads/
+tar zxvf asterisk-20-current.tar.gz
+cd asterisk-20.8.1
+./configure
+make menuconfig
+make menuselect
+make
+make install
+make samples
+cd /etc/asterisk/
+asterisk -cvvv
+pjsip show endpoints
+cd Donwloads/asterisk-20.8.1/contrib/init.d/
+cp rc.debian.asterisk /etc/init.d/asterisk
+
+
+Video 03 :
+----------
+
+cd
+type asterisk
+gedit /etc/init.d/asterisk
+'''
+DAEMON = /usr/sbin/asterisk
+ASTVARRUNDIR = /var/run/aterisk
+ASTETCDIR = /etc/asterisk
+'''
+/etc/init.d/asterisk start
+asterisk -r
+exit
+ps aux
+/etc/init.d/asterisk stop
+useradd -d /var/lib/asterisk asterisk
+cat /etc/passwd
+chown -R asterisk /var/spool/asterisk /var/lib/asterisk /var/run/asterisk
+cd Downloads/asterisk-20.8.1/contrib/init.d/
+cp etc_default_asterisk /etc/default/asterisk
+gedit /etc/default/asterisk
+'''
+AST_USER = "asterisk"
+AST_GROUP = "asterisk"
+'''
+/etc/init.d/asterisk start
+ps aux
+asterisk -r
+exit
+gedit /etc/asterisk/asterisk.conf
+'live_dangerously = no'
+/etc/init.d/asterisk stop
+/etc/init.d/asterisk start
+asterisk -r
+exit
+update-rc.d asterisk defaults
+
+
+Video 04 :
+----------
+
+apt-get install isc-dhcp-server
+gedit /etc/default/isc-dhcp-server
+'INTERFACESv4 = "eth0"'
+gedit /etc/network/interfaces
+'''
+auto lo
+iface lo inet loopback
+auto eth0
+iface eth0 inet static
+	address 192.168.100.55
+	netmask 255.255.255.0
+	gateway 192.168.100.254
+	dns-nameservers 4.4.4.4
+	dns-nameservers 8.8.8.8
+'''
+gedit /etc/resolv.conf
+'nameserver 8.8.8.8'
+systemctl restart network
+ping www.google.com
+gedit /etc/dhcp/dhcpd.conf
+'''
+default-lease-time 3600;
+...
+subnet 192.168.100.200 netmask 255.255.255.0
+{
+	range 192.168.100.200 192.168.100.220;
+	option subnet-mask 255.255.255.0;
+	option domain-name-servers 8.8.8.8;
+	option domain-name local;
+	option routers 192.168.100.254;
+	default-lease-time 864000;
+	max-lease-time 864000;
+}
+'''
+/etc/init.d/isc-dhcp-server start
+date
+apt-get install ntp
+/etc/init.d/ntp stop
+ntpdate pool.ntp.org
+/etc/init.d/ntp start
+tail -f /var/log/syslog
+
+
+Video 05 :
+----------
+
+cp /etc/asterisk/pjsip.conf /etc/asterisk/pjsip.conf.orig
+echo "" > pjsip.conf
+gedit /etc/asterisk/pjsip.conf
+'''
+qualify = yes
+[martine]
+	type = friend
+	context = phones
+	allow = ulaw, alaw
+	secret = 12345678
+	host = dynamic
+[henry]
+	type = friend
+	context = phones
+	allow = ulaw, alaw
+	secret = 87654321
+	host = dynamic
+'''
+add-apt-repository ppa:appimagelauncher-team/stable
+apt update
+apt-get install appimagelauncher
+asterisk -rvvv
+pjsip reoad
+pjsip show endpoints
+
+
+Video 06 :
+----------
+
+cp /etc/asterisk/extensions.conf /etc/asterisk/extensions.conf.orig
+echo "" > extensions.conf
+gedit /etc/asterisk/extensions.conf
+'''
+[phones]
+exten  => 100, 1, NoOp (First Line)
+exten  => 100, 2, NoOp (Second Line)
+exten  => 100, 3, Hangup
+'''
+asterisk -rvvv
+dialplan reload
+
+
+Video 07 :
+----------
+
+core show applications like dial
+core show applications describing dial
+core show application dial
+exit
+gedit /etc/asterisk/extensions.conf
+'''
+[phones]
+exten  => 100, 1, NoOp (First Line)
+exten  => 100, 2, NoOp (Second Line)
+exten  => 100, 3, Dial (PJSIP/henry)
+exten  => 100, 4, Hangup
+'''
+touch /var/log/asterisk//cdr-csv//Master.csv
+chown asterisk /var/log/asterisk//cdr-csv//Master.csv
+
+
+Video 08 :
+----------
+
+gedit /etc/asterisk/extensions.conf
+'''
+[phones]
+exten  => 100, 1, NoOp (First Line)
+exten  => 100, n, NoOp (Second Line)
+exten  => 100, n, Dial (PJSIP/henry)
+exten  => 100, n, Hangup
+'''
+gedit /etc/asterisk/extensions.conf
+'''
+[phones]
+exten  => 100, 1, NoOp (First Line)
+same   => n, NoOp (Second Line)
+same   => n, Dial (PJSIP/henry)
+same   => n, Hangup
+'''
+gedit /etc/asterisk/extensions.conf
+'''
+[phones]
+exten  => 100, 1, NoOp (First Line)
+same   => n, NoOp (Second Line)
+same   => n, Dial (PJSIP/martine)
+same   => n, Hangup
+exten  => 200, 1, NoOp (First Line)
+same   => n, NoOp (Second Line)
+same   => n, Dial (PJSIP/henry)
+same   => n, Hangup
+'''
+
+
+Video 09 :
+----------
+
+cd /var/lib/asterisk/sounds/en
+ls
+gedit /etc/asterisk/extensions.conf
+'''
+[phones]
+exten  => 100, 1, NoOp (First Line)
+same   => n, NoOp (Second Line)
+same   => n, Dial (PJSIP/martine)
+same   => n, Hangup
+exten  => 200, 1, NoOp (First Line)
+same   => n, NoOp (Second Line)
+same   => n, Playback (tt-monkeys)
+same   => n, Dial (PJSIP/henry)
+same   => n, Hangup
+'''
+
+
+Video 10 :
+----------
+
+gedit /etc/asterisk/extensions.conf
+'''
+[phones]
+exten  => 100, 1, NoOp (Appel vers Martine)
+same   => n, Dial (PJSIP/martine)
+same   => n, Hangup
+exten  => 200, 1, NoOp (Appel vers Henry)
+same   => n, Dial (PJSIP/henry)
+same   => n, Hangup
+'''
+gedit /etc/asterisk/pjsip.conf
+'''
+[outside]
+	type = friend
+	context = incoming
+	allow = ulaw, alaw
+	secret = 12345678
+	host = dynamic
+'''
+gedit /etc/asterisk/extensions.conf
+'''
+[incoming]
+exten  => 991123123, 1, Goto (phones, 100, 1)
+'''
+
+
+Video 11 :
+----------
+
+gedit /etc/asterisk/extensions.conf
+'''
+[phones]
+...
+exten  => 8888, 1, Goto (outgoing, 8888, 1)
+[outgoing]
+exten  => 8888, 1, Dial (PJSIP/outside)
+'''
+
+
+Video 12 :
+----------
+
+gedit /etc/asterisk/extensions.conf
+'''
+[phones]
+exten  => _XXXX, 1, Goto (outgoing, 8888, 1)
+'''
+gedit /etc/asterisk/extensions.conf
+'''
+[phones]
+exten  => _0X., 1, Goto (outgoing, 8888, 1)
+'''
+
+
+Video 13 :
+----------
+
+gedit /etc/asterisk/extensions.conf
+'''
+[phones]
+exten  => _0X., 1, NoOp (${EXTEN:-3})
+same   => n, Goto (outgoing, ${EXTEN:1}, 1)
+'''
+
+
+Video 14 :
+----------
+
+asterisk -rvvv
+core show application GotoIfTime
+exit
+gedit /etc/asterisk/extensions.conf
+'''
+[incoming]
+exten  => 991123123, 1, GotoIfTime (8:00-17:00, mon-fri, *, *?phones, 100, 1)
+same   => n, Playback (tt-monkeys)
+same   => n, Hangup
+'''
+
+
+Video 15 :
+----------
+
+asterisk -rvvv
+core show application Gosub
+exit
+gedit /etc/asterisk/extensions.conf
+'''
+[incoming]
+...
+exten  => 911123124, 1, GoSub (timecheck, s, 1)
+same   => n, Goto (phones, 100, 1)
+[timecheck]
+exten  => s, 1, GotoIfTime (8:00-17:00, mon-thu, *, *?ok, 1)
+same   => n, GotoIfTime (8:00-12:00, fri-fri, *, *?ok, 1)
+same   => n, Playback (tt-monkeys)
+same   => n, Hangup
+exten  => ok, 1, Return
+'''
+
+
+Video 16 :
+----------
+
+asterisk -rvvv
+core show applications mail
+exit
+cp /etc/asterisk/voicemail.conf /etc/asterisk/voicemail.conf.orig
+gedit /etc/asterisk/voicemail.conf
+'''
+[default]
+100  => 1234, Martine, martine.maraval@ip3office.com
+200  => 1234, Henry, henry.causse@ip3office.com
+''
+''
+''
+'''
+
+
+Video 17 :
+----------
+
+gedit /etc/asterisk/extensions.conf
+'''
+[phones]
+exten  => 100, 1, NoOp (Appel pour Martine)
+same   => n, Dial (PJSIP/martine, 5)
+same   => n, VoiceMail (${EXTEN})
+same   => n, Hangup
+exten  => 200, 1, NoOp (Appel pour Henry)
+same   => n, Dial (PJSIP/henry, 10)
+same   => n, VoiceMail (${EXTEN})
+same   => n, Hangup
+'''
+gedit /etc/asterisk/extensions.conf
+'''
+[phones]
+...
+exten  => *100, 1, VoiceMailMain (100)
+same   => n, Hangup
+'''
+
+
+Video 18 :
+----------
+
+asterisk -rvvv
+dialplan reload
+core show application GotoIf
+exit
+gedit /etc/asterisk/extensions.conf
+'''
+[phones]
+exten  => *200, 1, Answer
+same   => n, WaitExten
+same   => n, Hangup
+exten  => 100, 1, NoOp (Appel pour Martine)
+same   => n, Dial (PJSIP/martine, 5)
+same   => n, GotoIf ($[ "${DIALSTATUS}" = "BUSY" ]?100-busy, 1)
+same   => n, VoiceMail (${EXTEN}, u)
+same   => n, Hangup
+exten  => 100-busy, 1, VoiceMail (${EXTEN:0:3}, b)
+same   => n, Hangup
+'''
+asterisk -rvvv
+dialplan reload
+exit
+gedit /etc/asterisk/extensions.conf
+'''
+[phones]
+''
+''
+''
+'''
+
+
+Video 19 :
+----------
+
+apt-get install postfix
+dpkg-reconfigure postfix
+systemctl reload postfix
+apt-get install mailutils
+echo hello | mail -s test pl26.8000@gmail.com
+asterisk -rvvv
+dialplan reload
+exit
+gedit /etc/asterisk/voicemail.conf
+'''
+emailsubject = ?
+...
+emailbody = ?
+'''
+
+
+Video 20 :
+----------
+
+gedit /etc/asterisk/extensions.conf
+'''
+[incoming]
+...
+exten  => 911123300, 1, GoSub (timecheck, s, 1)
+same   => n, Goto (phones, 300, 1)
+[phones]
+...
+exten  => 300, 1, NoOp (Support)
+same   => n, Dial (PJSIP/martine&PJSIP/henry, 120)
+same   => n, Hangup
+'''
+
+
+Video 21 :
+----------
+
+cp /etc/asterisk/queues.conf /etc/asterisk/queues.conf.orig
+gedit /etc/asterisk/queues.conf
+'''
+[support]
+member  => PJSIP/martine
+member  => PJSIP/henry
+'''
+asterisk -rvvv
+queue reload all
+queue show support
+core show application Queue
+exit
+gedit /etc/asterisk/extensions.conf
+'''
+exten  => 300, 1, NoOp (Service-client)
+same   => n, Queue (support, , , , 60)
+same   => n, Dial (PJSIP/martine&PJSIP/henry, 120)
+same   => n, Hangup
+'''
+
+
+Video 22 :
+----------
+
+gedit /etc/asterisk/queues.conf
+'''
+[support]
+strategy = random
+timeout = 6
+'''
+gedit /etc/asterisk/extensions.conf
+'''
+exten  => 300, 1, NoOp (Service-client)
+same   => n, Queue (support, , , , 60)
+same   => n, Hangup
+''
+'''
+asterisk -rvvv
+dialplan reload
+queue reload all
+exit
+
+
+Video 23 :
+----------
+
+gedit /etc/asterisk/queues.conf
+'''
+[support]
+strategy = ringall
+timeout = 6
+member  => PJSIP/martine
+''
+'''
+asterisk -rvvv
+queue add member PJSIP/henry to support
+queue reload all
+queue show support
+queue remove member PJSIP/henry from support
+
+
+Video 24 :
+----------
+
+queue add member PJSIP/henry to support
+exit
+gedit /etc/asterisk/extensions.conf
+'''
+exten  => 300, 1, NoOp (Service-client)
+same   => n, Answer
+same   => n, Queue (support, , , , 60)
+same   => n, Hangup
+'''
+asterisk -rvvv
+dialplan reload
+exit
+cp /etc/asterisk/musiconhold.conf /etc/asterisk/musiconhold.conf.orig
+gedit /etc/asterisk/musiconhold.conf
+'''
+[support]
+mode = files
+directory = support
+'''
+cd /var/lib/asterisk
+mkdir support
+chown asterisk support/
+cp moh/macroform-cold_day.wav support/macroform-cold_day.wav
+ls
+chown asterisk macroform-cold_day.wav
+asterisk -rvvv
+moh reload
+moh show classes
+core show applications MusicOnHold
+exit
+gedit /etc/asterisk/extensions.conf
+'''
+exten  => 300, 1, NoOp (Service-client)
+same   => n, Set (CHANNEL (musicclass) = support)
+same   => n, Answer
+same   => n, Queue (support, , , , 60)
+same   => n, Hangup
+'''
+asterisk -rvvv
+dialplan reload
+
+
+Video 25 :
+----------
+
+core show application AddQueueMember
+exit
+gedit /etc/asterisk/extensions.conf
+'''
+[phones]
+exten  => *201, 1, NoOp (Henry a été ajouté au service-client)
+same   => n, Answer
+same   => n, AddQueueMember (support, PJSIP/henry)
+same   => n, Playback (beep)
+same   => n, Hangup
+exten  => *202, 1, NoOp (Henry a été retiré au service-client)
+same   => n, Answer
+same   => n, RemoveQueueMember (support, PJSIP/henry)
+same   => n, Playback (beeperr)
+same   => n, Hangup
+'''
+
+
+Video 26 :
+----------
+
+asterisk -rvvv
+database show
+database put ip3office/test martine ok
+database put ip3office/test henry ok
+database show
+database deltree ip3office
+database show
+core show function DB_EXISTS
+exit
+gedit /etc/asterisk/extensions.conf
+'''
+[phones]
+...
+exten  => *300, 1, NoOp (Test base de données)
+same   => n, GotoIf (${DB_EXISTS (ip3office/martine) }?*300-ok, 1)
+same   => n, Hangup
+exten  => *300-ok, 1, NoOp (Martine existe)
+same   => n, Answer
+same   => n, Playback (beep)
+same   => n, Hangup
+'''
+asterisk -rvvv
+dialplan reload
+database put ip3office martine ok
+database put ip3office henry ok
+
+
+Video 27 :
+----------
+
+core show function DB
+core show function REGEX
+exit
+gedit /etc/asterisk/extensions.conf
+'''
+[phones]
+...
+exten  => *300, 1, NoOp (Martine login/logout)
+same   => n, GotoIf (${REGEX ("PJSIP/martine", ${DB (Queue/PersistentMembers/support) }) }?300-logout, 1:*300-login, 1)
+same   => n, Hangup
+exten  => *300-login, 1, NoOp (Martine n'existe pas, login)
+same   => n, AddQueueMember (support, PJSIP/martine)
+same   => n, Playback (beep)
+same   => n, Hangup
+exten  => *300-logout, 1, NoOp (Martine existe, logout)
+same   => n, RemoveQueueMember (support, PJSIP/martine)
+same   => n, Playback (beeperr)
+same   => n, Hangup
+'''
+
+
+Video 28 :
+----------
+
+gedit /etc/asterisk/extensions.conf
+'''
+[phones]
+...
+exten  => *555, 1, NoOp (Enregistrement)
+same   => n, Answer
+same   => n, Record (test.wav)
+same   => n, Hangup
+'''
+cd /var/lib/asterisk/sounds
+ls
+
+
+Video 29 :
+----------
+
+cd /home/electro-wave/Downloads
+scp test_prompt.wav electro-wave@192.168.100.55
+gedit /etc/asterisk/extensions.conf
+'''
+[phones]
+...
+exten  => *666, 1, NoOp (Ecoute)
+same   => n, Answer
+same   => n, Playback (test_prompt)
+same   => n, Hangup
+'''
+
+
+Video 31 :
+----------
+
+gedit /etc/asterisk/extensions.conf
+'''
+[ivr-1]
+exten  => s, 1, NoOp (IVR 1)
+same   => n, Answer
+same   => n, Playback (ivr_q1)
+same   => n, WaitExten (5)
+exten  => 1, 1, NoOp (1 appuyé)
+same   => n, Queue (test)
+exten  => 2, 1, NoOp (2 appuyé)
+same   => n, Queue (test_bis)
+[phones]
+...
+exten  => 800, 1, Goto (ivr-1, s, 1)
+'''
+
+
+Video 32 :
+----------
+
+gedit /etc/asterisk/extensions.conf
+'''
+[ivr-1]
+...
+exten  => i, 1, NoOp (Invalide)
+same   => n, Playback (ivr_wrong_key)
+same   => n, Goto (s, 1)
+exten  => t, 1, NoOp (Temps écoulé)
+same   => n, Queue (test)
+'''
+
+
+Video 33 :
+----------
+
+gedit /etc/asterisk/extensions.conf
+'''
+[ivr-1]
+exten  => s, 1, NoOp (IVR 1)
+same   => n, Set (LOOP = 0)
+same   => n, Answer
+same   => n (loop) , Playback (ivr_q1)
+same   => n, WaitExten (5)
+...
+exten  => t, 1, NoOp (Temps écoulé)
+same   => n, Set (LOOP = $[ ${LOOP} + 1 ])
+same   => n, GotoIf ($[ ${LOOP} < 2 ]?s, loop)
+same   => n, Queue (test)
+'''
+
+
+Video 36 :
+----------
+
+apt-get install wireshark
+tcpdump -sO -w test.pcap
+
+
+Video 37 :
+----------
+
+asterisk -rvvv
+pjsip set logger on
+exit
+ip addr
+tcpdump -i eth0 -w test.pcap
+Ctrl + C
+tcpdump -i eth0 -s 0 -w test.pcap
+Ctrl + C
+
+
+Video 38 :
+----------
+
+scp electro-wave@192.168.100.55:/home/electro-wave/Downloads/test.pcap .
+
+
+Video 39 :
+----------
+
+gedit /etc/asterisk/pjsip.conf
+'canreinvite = no'
+asterisk -rvvv
+pjsip reload
+exit
+tcpdump -i eth0 -s 0 -w test.pcap
+Ctrl + C
+scp electro-wave@192.168.100.55:/home/electro-wave/Downloads/test.pcap .
+
+
+Video 42 :
+----------
+
+gedit /etc/asterisk/pjsip.conf
+'register  => myUsername:myPassword@myHost'
+asterisk -rvvv
+pjsip reload
+pjsip show endpoints
+pjsip show registration
+
+
+Video 43 :
+----------
+
+pjsip set logger host myProviderAddress
+exit
+
+
+Video 44 :
+----------
+
+gedit /etc/asterisk/pjsip.conf
+'''
+[provider]
+	type = friend
+	context = provider
+	allow = ulaw, alaw
+	secret = myPassword
+	host = myProviderAddress
+	nat = force_rport, comedia
+'''
+asterisk -rvvv
+pjsip reload
+pjsip show endpoints
+exit
+
+
+Video 45 :
+----------
+
+gedit /etc/asterisk/extensions.conf
+'''
+[provider]
+exten  => _X., 1, Goto (phones, 100, 1)
+'''
+gedit /etc/asterisk/pjsip.conf
+'''
+[provider]
+...
+	insecure = invite
+'''
+asterisk -rvvv
+dialplan reload
+pjsip reload
+pjsip set logger host myProviderAddress
+exit
+
+
+Video 46 :
+----------
+
+gedit /etc/asterisk/extensions.conf
+'''
+[phones]
+...
+exten  => _0X., 1, NoOp (${EXTEN:1})
+same   => n, Goto (outgoing, ${EXTEN:1}, 1)
+[outgoing]
+exten  => _X., 1, Dial (PJSIP/outside)
+'''
+asterisk -rvvv
+dialplan reload
+exit
+gedit /etc/asterisk/extensions.conf
+'''
+[outgoing]
+exten  => _X., 1, Dial (PJSIP/provider/${EXTEN})
+'''
+gedit /etc/asterisk/pjsip.conf
+'''
+[provider]
+...
+	fromdomain = myProviderAddress
+	defaultuser = myUsername
+'''
+asterisk -rvvv
+dialplan reload
+pjsip reload
+pjsip set logger host myProviderAddress
+exit
+
+
+Video 47 :
+----------
+
+gedit /etc/asterisk/extensions.conf
+'''
+[outgoing]
+exten  => _X., 1, Set (CALLERID (num) = myProviderNumber)
+same   => n, Dial (PJSIP/provider/${EXTEN})
+'''
+
+
+Video 50 :
+----------
+
+cp /etc/asterisk/logger.conf /etc/asterisk/logger.conf.orig
+gedit /etc/asterisk/logger.conf
+'messages.log  => notice, warning, error, verbose (3) '
+chown -R asterisk /var/log/asterisk/
+tail -f /var/log/asterisk/messages.log
+asterisk -r
+logger reload
+logger show channels
+exit
+less /var/log/asterisk/messages.log
+asterisk -r
+logger rotate
+exit
+
+
+Video 51 :
+----------
+
+cd /etc/asterisk
+ls cdr*
+cp cdr.conf cdr.conf.orig
+tail -f /var/log/asterisk/cdr-csv/Master.csv
+
+
+Video 52 :
+----------
+
+gedit /etc/asterisk/extensions.conf
+'''
+[phones]
+...
+exten  => 100, 1, NoOp (Appel pour Martine)
+same   => n, Set (CDR (userfield) = foo)
+same   => n, Dial (PJSIP/martine, 5)
+'''
+asterisk -r
+dialplan reload
+exit
+
+
+Video 53 :
+----------
+
+gedit /home/electro-wave/Downloads/test1.call
+'''
+Channel: PJSIP/henry
+Application: Playback
+Data: tt-monkeys
+'''
+chown -R asterisk /var/log/asterisk/
+cp /home/electro-wave/Downloads/test1.call /var/spool/asterisk/outgoing/test.call
+chown asterisk /var/spool/asterisk/outgoing/test.call
+
+
+Video 54 :
+----------
+
+asterisk -r
+module show pbx_spool.so
+exit
+gedit /home/electro-wave/Downloads/test2.call
+'''
+Channel: PJSIP/henry
+MaxRetries: 2
+RetryTime: 60
+WaitTime: 30
+Context: phones
+Extension: 100
+'''
+cp /home/electro-wave/Downloads/test2.call /var/spool/asterisk/outgoing/test.call
+chown asterisk /var/spool/asterisk/outgoing/test.call
+
+
+Video 56 :
+----------
+
+apt-get install net-tools
+netstat -lpn
+cp /etc/asterisk/manager.conf /etc/asterisk/manager.conf.orig
+gedit /etc/asterisk/manager.conf
+'''
+[general]
+enabled = yes
+...
+[martine]
+secret = 12345678
+deny = 0.0.0.0/0.0.0.0
+permit = 192.168.100.0/255.255.255.0
+read = all
+write = all
+'''
+service asterisk restart
+netstat -lpn
+
+
+Video 57 :
+----------
+
+asterisk -r
+telnet localhost 5038
+Action: login
+Username: martine
+Secret: 12345678
+telnet 192.168.100.55 5038
+Action: login
+Username: martine
+Secret: 12345678
+
+
+Video 58 :
+----------
+
+manager show commands
+manager show command originate
+telnet 192.168.100.55 5038
+Action: Originate
+Channel: PJSIP/henry
+Context: phones
+Exten: 200
+Priority: 1
